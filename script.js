@@ -10,22 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isEntered = false;
 
-    // "A Cruel Angel's Thesis" sample lyrics for syncing
-    const loopingLyrics = [
-        "残酷な天使のように",
-        "少年よ 神話になれ",
-        "蒼い風がいま",
-        "胸のドアを叩いても",
-        "私だけをただ見つめて",
-        "微笑んでるあなた",
-        "そっとふれるもの",
-        "もとめることに夢中で",
-        "運命さえまだ知らない",
-        "いたいけな瞳",
-        "だけどいつか気付くでしょう",
-        "その背中には",
-        "遥か未来 めざすための",
-        "羽根があること"
+    // "A Cruel Angel's Thesis" TV Size Lyrics Sequence
+    const timedLyrics = [
+        { time: 7, text: "残酷な天使のように\n(Zankoku na tenshi no you ni)" },
+        { time: 12, text: "少年よ 神話になれ\n(Shounen yo shinwa ni nare)" },
+        { time: 17, text: "蒼い風がいま\n胸のドアを叩いても" },
+        { time: 23, text: "私だけをただ見つめて\n微笑んでるあなた" },
+        { time: 28, text: "そっとふれるもの\n求めることに夢中で" },
+        { time: 34, text: "運命さえまだ知らない\nいたいけな瞳" },
+        { time: 39, text: "だけどいつか気づくでしょう\nその背中には" },
+        { time: 45, text: "遥か未来めざすための\n羽があること" },
+        { time: 50, text: "残酷な天使のテーゼ\n窓辺からやがて飛び立つ" },
+        { time: 58, text: "ほとばしる熱いパトスで\n思い出を裏切るなら" },
+        { time: 65, text: "この宇宙を抱いて輝く\n少年よ 神話になれ" },
+        { time: 72, text: "" }
     ];
 
     enterBtn.addEventListener('click', () => {
@@ -121,24 +119,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lyrics Loop System - Time Synced
+    // Lyrics Loop System - TV Size Sync
     let activeLyricIndex = -1;
     function startLyrics() {
         function checkLyricsTime() {
             if (!bgm.paused) {
                 const currentTime = bgm.currentTime;
                 
-                if (currentTime >= 5) {
-                    const elapsed = currentTime - 5;
-                    const newIndex = Math.floor(elapsed / 5) % loopingLyrics.length;
-                    const windowTime = elapsed % 5;
-                    
-                    if (newIndex !== activeLyricIndex) {
-                        activeLyricIndex = newIndex;
-                        lyricText.innerText = loopingLyrics[activeLyricIndex];
-                        lyricText.style.opacity = '0.10';
-                    } else if (windowTime > 4.0 && lyricText.style.opacity !== '0') {
-                        // Fade out 1 second before next line
+                // Manual perfect loop at ~1:30 (90 seconds)
+                if (currentTime >= 90) {
+                    bgm.currentTime = 0;
+                    activeLyricIndex = -1;
+                    lyricText.style.opacity = '0';
+                    requestAnimationFrame(checkLyricsTime);
+                    return;
+                }
+                
+                // Find current lyric block
+                let newIndex = -1;
+                for (let i = timedLyrics.length - 1; i >= 0; i--) {
+                    if (currentTime >= timedLyrics[i].time) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+                
+                if (newIndex !== activeLyricIndex) {
+                    activeLyricIndex = newIndex;
+                    if (activeLyricIndex !== -1 && timedLyrics[activeLyricIndex].text !== "") {
+                        lyricText.innerText = timedLyrics[activeLyricIndex].text;
+                        lyricText.style.opacity = '0.22'; // Opacity 0.18-0.28 per rules
+                    } else {
+                        lyricText.style.opacity = '0';
+                    }
+                } else if (newIndex !== -1) {
+                    // Check if we need to fade out before next line
+                    const nextLyricTime = (newIndex + 1 < timedLyrics.length) ? timedLyrics[newIndex + 1].time : 90;
+                    // Fade out 0.6s before the next line starts
+                    if (nextLyricTime - currentTime <= 0.6 && lyricText.style.opacity !== '0') {
                         lyricText.style.opacity = '0';
                     }
                 }
