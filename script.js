@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. Audio Trigger and Fade In
         bgm.volume = 0;
+        bgm.loop = true; // Ensure it loops continuously
         bgm.play().catch(e => {
             console.log("Audio play failed, user interaction or missing file:", e);
         });
@@ -72,12 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let vol = 0;
         const fadeInterval = setInterval(() => {
             if (vol < 0.6) {
-                vol += 0.05;
+                vol = Math.min(0.6, vol + 0.04);
                 bgm.volume = vol;
             } else {
                 clearInterval(fadeInterval);
             }
-        }, 150);
+        }, 100); // 15 steps of 100ms = 1.5s fade-in
 
         // 4. Start Lyrics System
         startLyrics();
@@ -87,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('scrollable');
             // Trigger an initial scroll calculation just in case
             window.dispatchEvent(new Event('scroll'));
-        }, 1100);
+        }, 800); // Immediately after button erase (0.7s)
     });
 
     // Scroll Cinematic Logic
@@ -107,17 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Easing function (ease-out cubic) to make motion feel heavier and cinematic
             const easeOut = 1 - Math.pow(1 - scrollProgress, 3);
 
-            // Start offscreen at -50vw and 50vw respectively, move towards 0
-            const shinjiX = -50 * (1 - Math.pow(1 - scrollProgress, 1.5)); 
-            const evaX = 50 * (1 - Math.pow(1 - scrollProgress, 1.5));
+            // Start offscreen at -120vw and 120vw respectively, move towards 0
+            const shinjiX = -120 * (1 - easeOut); 
+            const evaX = 120 * (1 - easeOut);
 
-            shinji.style.transform = `translate(calc(-50vw + ${shinjiX}vw), -50%)`;
-            // Wait, previous CSS had: 
-            // .shinji-half { right: 50%; transform: translate(-50vw, -50%); }
-            // If I just set `translate(${shinjiX}vw, -50%)`, it overwrites the CSS transform.
-            // Let's ensure the calculation is relative to their native anchors.
-            // Since shinji is anchored `right: 50%`, translateX(0) puts its right edge exactly at center.
-            // So we want it to start at -50vw, and go to 0vw.
             shinji.style.transform = `translate(${shinjiX}vw, -50%)`;
             // Opacity hits 1 halfway through scroll
             shinji.style.opacity = Math.min(scrollProgress * 2, 1);
@@ -127,22 +121,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lyrics Loop System
-    let lyricIndex = 0;
+    // Lyrics Loop System - Time Synced
+    let activeLyricIndex = -1;
     function startLyrics() {
-        updateLyric();
-        setInterval(updateLyric, 4000); // 4 seconds per line
-    }
-
-    function updateLyric() {
-        // Fade out
-        lyricText.style.opacity = 0;
+        function checkLyricsTime() {
+            if (!bgm.paused) {
+                const currentTime = bgm.currentTime;
+                
+                if (currentTime >= 5) {
+                    const elapsed = currentTime - 5;
+                    const newIndex = Math.floor(elapsed / 5) % loopingLyrics.length;
+                    const windowTime = elapsed % 5;
+                    
+                    if (newIndex !== activeLyricIndex) {
+                        activeLyricIndex = newIndex;
+                        lyricText.innerText = loopingLyrics[activeLyricIndex];
+                        lyricText.style.opacity = '0.10';
+                    } else if (windowTime > 4.0 && lyricText.style.opacity !== '0') {
+                        // Fade out 1 second before next line
+                        lyricText.style.opacity = '0';
+                    }
+                }
+            }
+            requestAnimationFrame(checkLyricsTime);
+        }
         
-        setTimeout(() => {
-            lyricText.innerText = loopingLyrics[lyricIndex];
-            // Fade in with slight opacity as requested (0.06 - 0.12)
-            lyricText.style.opacity = 0.10;
-            lyricIndex = (lyricIndex + 1) % loopingLyrics.length;
-        }, 800); // Wait for fade out
+        requestAnimationFrame(checkLyricsTime);
     }
 });

@@ -172,6 +172,15 @@ body.scrollable {
     animation: flicker 4s infinite, horizontalDrift 6s infinite alternate ease-in-out;
     transition: filter 0.3s ease, transform 0.3s ease;
     will-change: opacity, transform, filter;
+    
+    -webkit-mask-image: linear-gradient(to bottom right, transparent 50%, black 50.1%);
+    mask-image: linear-gradient(to bottom right, transparent 50%, black 50.1%);
+    -webkit-mask-size: 300% 300%;
+    mask-size: 300% 300%;
+    -webkit-mask-position: 100% 100%;
+    mask-position: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
 }
 
 .enter-btn:hover {
@@ -190,9 +199,26 @@ body.scrollable {
 }
 
 .enter-btn-wrapper.exiting {
-    transform: translate(60vw, -20vh) rotate(10deg);
-    opacity: 0;
     pointer-events: none;
+}
+
+.enter-btn-wrapper.exiting .enter-btn {
+    animation: diagonalWipe 0.7s ease-in forwards;
+}
+
+@keyframes diagonalWipe {
+    0% {
+        -webkit-mask-position: 100% 100%;
+        mask-position: 100% 100%;
+        opacity: 0.9;
+        filter: drop-shadow(0 0 10px var(--primary-purple)) brightness(1.2);
+    }
+    100% {
+        -webkit-mask-position: 0% 0%;
+        mask-position: 0% 0%;
+        opacity: 0;
+        filter: drop-shadow(0 0 20px var(--primary-purple)) brightness(1.8) blur(2px);
+    }
 }
 
 /* Scroll Cinematic Section */
@@ -229,13 +255,13 @@ body.scrollable {
 
 .shinji-half {
     right: 50%;
-    transform: translate(-50vw, -50%);
+    transform: translate(-120vw, -50%);
     object-position: right center;
 }
 
 .eva-half {
     left: 50%;
-    transform: translate(50vw, -50%);
+    transform: translate(120vw, -50%);
     object-position: left center;
 }
 
