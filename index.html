@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVANGELION SYSTEM ENTRY</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <audio id="bgm" src="cruel_angels_thesis.mp3" loop></audio>
+
+    <div class="ui-overlay">
+        <div class="grid-overlay"></div>
+        <div class="hud-line top-line"></div>
+        <div class="hud-line bottom-line"></div>
+        <div class="hud-label top-left">SYNC RATE: 400%</div>
+        <div class="hud-label top-right">PROJECT E</div>
+        <div class="hud-label bottom-right">INTERNAL BATTERY: ACTIVE</div>
+        
+        <div class="sync-indicator">
+            <div class="sync-bar"></div>
+            <div class="sync-bar"></div>
+            <div class="sync-bar"></div>
+            <div class="sync-bar"></div>
+            <div class="sync-bar"></div>
+        </div>
+    </div>
+
+    <div class="lyrics-container">
+        <div id="lyric-text"></div>
+    </div>
+
+    <div class="scroll-container">
+        <div class="face-split-container">
+            <img src="shinji.png" alt="Shinji" class="face-half shinji-half">
+            <img src="eva 01.png" alt="Eva 01" class="face-half eva-half">
+        </div>
+    </div>
+
+    <div class="hero-container" id="heroContainer">
+        <div class="nerv-logo-wrapper" id="nervLogoWrapper">
+            <img src="nerv3.png" alt="NERV" class="nerv-logo" id="nervLogo">
+        </div>
+        <div class="enter-btn-wrapper" id="enterBtnWrapper">
+            <img src="enterbut2.png" alt="Enter" class="enter-btn" id="enterBtn">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
