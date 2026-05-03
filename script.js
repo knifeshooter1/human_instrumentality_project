@@ -7,8 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const shinji = document.querySelector('.shinji-half');
     const eva = document.querySelector('.eva-half');
     const lyricText = document.getElementById('lyric-text');
+    const faceSplit = document.querySelector('.face-split-container');
+    const shakeWrapper = document.getElementById('shake-wrapper');
+    const impactFlash = document.getElementById('impact-flash');
+    const centerDivider = document.getElementById('center-divider');
 
     let isEntered = false;
+    let isSettled = false;
 
     // "A Cruel Angel's Thesis" TV Size Lyrics Sequence
     const timedLyrics = [
@@ -78,44 +83,87 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 100); // 15 steps of 100ms = 1.5s fade-in
 
-        // 4. Start Lyrics System
-        startLyrics();
+        // 5. Trigger the cinematic impact sequence
+        //    Timing: button wipe=0.7s + logo settle=1.1s → wait 1.1s then +0.2s delay
+        setTimeout(() => runImpactSequence(), 1300);
 
-        // 5. Enable Scroll
+        // 6. Enable Scroll (slightly after impact sequence begins so scroll bar
+        //    doesn't appear until the dust has settled)
         setTimeout(() => {
             document.body.classList.add('scrollable');
-            // Trigger an initial scroll calculation just in case
-            window.dispatchEvent(new Event('scroll'));
-        }, 800); // Immediately after button erase (0.7s)
+        }, 800);
     });
 
-    // Scroll Cinematic Logic
-    window.addEventListener('scroll', () => {
-        if (!isEntered) return;
+    // ---- CINEMATIC IMPACT SEQUENCE ----
+    function runImpactSequence() {
 
-        // Use requestAnimationFrame for smooth 60fps binding if performance becomes an issue,
-        // but modern browsers handle this well if we only update transforms.
+        // PHASE 1 — Approach (0ms)
+        // Both characters slide from ±120vw → ±10%, opacity 0→1, scale 0.98→1
+        shinji.classList.add('phase1');
+        eva.classList.add('phase1');
+
+        // PHASE 2 — Snap to center (750ms after phase 1 starts)
+        // Sharp fast snap from ±10% → 0%, then trigger all impact FX
+        setTimeout(() => {
+            // Remove phase1 so phase2 transition takes over
+            shinji.classList.remove('phase1');
+            eva.classList.remove('phase1');
+            shinji.classList.add('phase2-snap');
+            eva.classList.add('phase2-snap');
+
+            // --- IMPACT FX (all fire simultaneously) ---
+
+            // Flash
+            impactFlash.classList.add('active');
+            setTimeout(() => impactFlash.classList.remove('active'), 200);
+
+            // Screen shake
+            shakeWrapper.classList.add('shaking');
+            setTimeout(() => shakeWrapper.classList.remove('shaking'), 250);
+
+            // Scale pulse on face container
+            faceSplit.classList.add('scale-pulse');
+            setTimeout(() => faceSplit.classList.remove('scale-pulse'), 300);
+
+            // Center divider energy line
+            centerDivider.classList.add('active');
+
+        }, 750); // Phase 1 duration
+
+        // PHASE 3 — Settle (750 + 250ms)
+        setTimeout(() => {
+            // Swap to settled class for final crisp locked state
+            shinji.classList.remove('phase2-snap');
+            eva.classList.remove('phase2-snap');
+            shinji.classList.add('settled');
+            eva.classList.add('settled');
+
+            // Divider settles from bright flash to subtle line
+            centerDivider.classList.remove('active');
+            centerDivider.classList.add('settled');
+
+            // Start lyrics only after the composition has settled
+            startLyrics();
+
+            isSettled = true;
+        }, 1050); // Phase 1 (750) + Phase 2 (300)
+    }
+
+    // Scroll: subtle parallax depth ONLY after characters are settled
+    window.addEventListener('scroll', () => {
+        if (!isEntered || !isSettled) return;
+
         window.requestAnimationFrame(() => {
-            // maxScroll defines the maximum distance we can scroll
             const maxScroll = document.body.scrollHeight - window.innerHeight;
-            // Guard against division by zero if not scrollable yet
             if (maxScroll <= 0) return;
 
             const scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
 
-            // Easing function (ease-out cubic) to make motion feel heavier and cinematic
-            const easeOut = 1 - Math.pow(1 - scrollProgress, 3);
-
-            // Start offscreen at -120vw and 120vw respectively, move towards 0
-            const shinjiX = -120 * (1 - easeOut); 
-            const evaX = 120 * (1 - easeOut);
-
-            shinji.style.transform = `translate(${shinjiX}vw, -50%)`;
-            // Opacity hits 1 halfway through scroll
-            shinji.style.opacity = Math.min(scrollProgress * 2, 1);
-
-            eva.style.transform = `translate(${evaX}vw, -50%)`;
-            eva.style.opacity = Math.min(scrollProgress * 2, 1);
+            // Very subtle parallax drift — characters stay at 0% center,
+            // just a slight push to give depth while scrolling
+            const parallaxOffset = scrollProgress * 2; // max 2vw drift each way
+            shinji.style.transform = `translate(${-parallaxOffset}vw, -50%) scale(1)`;
+            eva.style.transform = `translate(${parallaxOffset}vw, -50%) scale(1)`;
         });
     });
 
