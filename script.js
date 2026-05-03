@@ -195,8 +195,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (newIndex !== activeLyricIndex) {
                     activeLyricIndex = newIndex;
                     if (activeLyricIndex !== -1 && timedLyrics[activeLyricIndex].text !== "") {
+                        // Reset transform before showing the new text so it can drift up again
+                        lyricText.style.transition = 'none';
+                        lyricText.style.transform = 'scaleX(1.15) translateY(5px)';
                         lyricText.innerText = timedLyrics[activeLyricIndex].text;
-                        lyricText.style.opacity = '0.07'; // Very subtle ambient background effect
+                        
+                        // Force reflow
+                        void lyricText.offsetWidth;
+                        
+                        // Apply transitions
+                        lyricText.style.transition = 'opacity 0.6s ease-in-out, transform 0.6s ease-out';
+                        lyricText.style.opacity = '0.28';
+                        lyricText.style.transform = 'scaleX(1.15) translateY(-5px)';
                     } else {
                         lyricText.style.opacity = '0';
                     }
@@ -206,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Fade out 0.6s before the next line starts
                     if (nextLyricTime - currentTime <= 0.6 && lyricText.style.opacity !== '0') {
                         lyricText.style.opacity = '0';
+                        lyricText.style.transform = 'scaleX(1.15) translateY(-10px)'; // Continue drifting up while fading
                     }
                 }
             }
