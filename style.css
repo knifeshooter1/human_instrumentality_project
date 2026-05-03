@@ -246,28 +246,28 @@ body.scrollable {
 .face-half {
     position: absolute;
     top: 50%;
-    height: 85vh;
-    max-height: 900px;
-    object-fit: contain;
+    height: 90vh;
+    max-height: 1000px;
+    object-fit: cover;
     opacity: 0;
     will-change: transform, opacity;
-    /* Depth shadow for separation between halves */
-    filter: drop-shadow(0 0 20px rgba(64, 43, 140, 0.2));
 }
 
 .shinji-half {
     right: 50%;
-    transform: translate(-120vw, -50%) scale(0.98);
+    width: 50vw;
+    object-fit: cover;
     object-position: right center;
-    /* Ambient purple edge glow — left side */
+    transform: translate(-120vw, -50%) scale(0.98);
     box-shadow: -20px 0 60px rgba(64, 43, 140, 0.15);
 }
 
 .eva-half {
     left: 50%;
-    transform: translate(120vw, -50%) scale(0.98);
+    width: 50vw;
+    object-fit: cover;
     object-position: left center;
-    /* Ambient purple edge glow — right side */
+    transform: translate(120vw, -50%) scale(0.98);
     box-shadow: 20px 0 60px rgba(64, 43, 140, 0.15);
 }
 
@@ -437,12 +437,13 @@ body.scrollable {
 
 #lyric-text {
     font-family: 'Shippori Mincho', serif;
-    font-size: 6vw;
+    font-size: 8.5vw;
     font-weight: 700;
+    letter-spacing: 0.18em;
     color: var(--secondary-purple);
     opacity: 0;
-    text-shadow: 0 0 25px var(--primary-purple);
+    text-shadow: none;
     transition: opacity 0.6s ease-in-out;
     white-space: pre-line;
-    line-height: 1.4;
+    line-height: 1.5;
 }

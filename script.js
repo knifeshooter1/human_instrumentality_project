@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeLyricIndex = newIndex;
                     if (activeLyricIndex !== -1 && timedLyrics[activeLyricIndex].text !== "") {
                         lyricText.innerText = timedLyrics[activeLyricIndex].text;
-                        lyricText.style.opacity = '0.22'; // Opacity 0.18-0.28 per rules
+                        lyricText.style.opacity = '0.07'; // Very subtle ambient background effect
                     } else {
                         lyricText.style.opacity = '0';
                     }
